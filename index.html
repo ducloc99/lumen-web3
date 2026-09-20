@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumen Protocol</title>
+<meta name="description" content="Settlement finality in 400 milliseconds. The layer 2 built for machines that trade faster than people can watch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#020306;
+    --panel:rgba(9,14,24,0.7);
+    --panel-border:rgba(80,240,255,0.18);
+    --white:#e8fbff;
+    --dim:#6c8092;
+    --cyan:#4ff2ff;
+    --violet:#9a5cff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--black);
+    color:var(--white);
+    font-family:'Rajdhani',sans-serif;
+    font-weight:500;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .display{font-weight:700;text-transform:uppercase;letter-spacing:0.01em;}
+  .wrap{max-width:1220px;margin:0 auto;padding-inline:32px;position:relative;z-index:3;}
+
+  #net{position:fixed;inset:0;z-index:0;}
+  .glow-line{position:fixed;top:0;left:0;right:0;height:1px;z-index:1;
+    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity:0.5;}
+
+  .panel{
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+
+  header{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:center;padding-block:26px;}
+  .mark{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:700;letter-spacing:0.03em;}
+  .mark .glyph{width:22px;height:22px;border:2px solid var(--cyan);border-radius:4px;transform:rotate(45deg);box-shadow:0 0 14px rgba(79,242,255,0.6);}
+  nav{display:flex;gap:34px;font-size:0.9rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.04em;}
+  nav a:hover{color:var(--cyan);}
+
+  .hero{text-align:center;padding-block:70px 40px;}
+  .hero-badge{display:inline-flex;align-items:center;gap:10px;padding:9px 20px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--cyan);margin-bottom:32px;}
+  .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  h1{font-size:clamp(2.8rem,7vw,5.6rem);font-weight:700;line-height:1.02;margin:0 auto 28px;max-width:16ch;text-wrap:balance;}
+  h1 .grad{background:linear-gradient(120deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p{max-width:52ch;margin:0 auto 40px;color:var(--dim);font-size:1.2rem;line-height:1.6;}
+  .cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+  .btn{font-weight:600;font-size:0.95rem;padding:15px 32px;border-radius:10px;display:inline-block;text-transform:uppercase;letter-spacing:0.03em;transition:transform .2s, box-shadow .2s;}
+  .btn-solid{background:linear-gradient(120deg,var(--cyan),var(--violet));color:var(--black);}
+  .btn-solid:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(79,242,255,0.4);}
+  .btn-line{border:1px solid var(--panel-border);}
+  .btn-line:hover{border-color:var(--cyan);color:var(--cyan);}
+
+  .live-ticker{display:flex;justify-content:center;gap:0;flex-wrap:wrap;margin-top:64px;max-width:900px;margin-inline:auto;}
+  .tick-cell{flex:1;min-width:180px;padding:26px 20px;text-align:center;border-left:1px solid var(--panel-border);}
+  .tick-cell:first-child{border-left:none;}
+  .tick-cell .n{font-family:'JetBrains Mono',monospace;font-size:1.7rem;font-weight:500;color:var(--cyan);}
+  .tick-cell .l{font-size:0.78rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;margin-top:6px;}
+
+  section{position:relative;z-index:5;padding-block:96px;}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  .section-head{text-align:center;max-width:620px;margin:0 auto 60px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--violet);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:16px;}
+  h2{font-size:clamp(2rem,3.6vw,2.8rem);margin:0;font-weight:700;text-wrap:balance;}
+  .section-head p{color:var(--dim);margin-top:16px;font-size:1.05rem;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .feature-card{padding:32px;position:relative;overflow:hidden;}
+  .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet));opacity:0;transition:opacity .3s;}
+  .feature-card:hover::before{opacity:1;}
+  .feature-card .tag{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);}
+  .feature-card h3{margin:14px 0 10px;font-size:1.3rem;font-weight:700;}
+  .feature-card p{margin:0;color:var(--dim);font-size:0.98rem;line-height:1.6;}
+
+  .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:0;overflow:hidden;border-radius:14px;}
+  .compare-col{padding:36px 30px;border-left:1px solid var(--panel-border);}
+  .compare-col:first-child{border-left:none;}
+  .compare-col.hi{background:linear-gradient(160deg, rgba(79,242,255,0.08), rgba(154,92,255,0.05));}
+  .compare-col h4{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--dim);text-transform:uppercase;margin:0 0 20px;}
+  .compare-col.hi h4{color:var(--cyan);}
+  .compare-row{display:flex;justify-content:space-between;padding-block:12px;border-top:1px solid var(--panel-border);font-size:0.92rem;}
+  .compare-row:first-of-type{border-top:none;}
+  .compare-row .v{font-family:'JetBrains Mono',monospace;color:var(--white);}
+  .compare-col.hi .compare-row .v{color:var(--cyan);}
+
+  .cta-final{text-align:center;padding:64px 40px;}
+  .cta-final h2{margin-bottom:16px;}
+  .cta-final p{color:var(--dim);margin-bottom:32px;}
+
+  footer{position:relative;z-index:5;padding-block:40px;border-top:1px solid var(--panel-border);}
+  .foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:0.82rem;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+
+  @media (max-width:900px){
+    .wrap{padding-inline:20px;}
+    nav{display:none;}
+    .feature-grid{grid-template-columns:1fr;}
+    .compare{grid-template-columns:1fr;}
+    .compare-col{border-left:none;border-top:1px solid var(--panel-border);}
+    .compare-col:first-child{border-top:none;}
+  }
+</style>
+</head>
+<body>
+<canvas id="net"></canvas>
+<div class="glow-line"></div>
+
+<div class="wrap">
+  <header>
+    <div class="mark"><span class="glyph"></span> LUMEN</div>
+    <nav>
+      <a href="#features">Protocol</a>
+      <a href="#compare">Benchmarks</a>
+      <a href="#build">Build</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <span class="hero-badge panel"><span class="pulse-dot"></span> MAINNET LIVE · BLOCK #4,281,902</span>
+    <h1>Finality in <span class="grad">400 milliseconds.</span></h1>
+    <p>Lumen is a settlement layer built for machines that trade faster than a person can watch a chart update — not for people watching charts.</p>
+    <div class="cta-row">
+      <a href="#build" class="btn btn-solid">Read the litepaper</a>
+      <a href="#" class="btn btn-line panel">Explore the testnet</a>
+    </div>
+
+    <div class="live-ticker panel">
+      <div class="tick-cell"><span class="n mono" id="tps">0</span><span class="l">TX / Second</span></div>
+      <div class="tick-cell"><span class="n mono">$0.0002</span><span class="l">Avg. Fee</span></div>
+      <div class="tick-cell"><span class="n mono">412ms</span><span class="l">Finality</span></div>
+      <div class="tick-cell"><span class="n mono">99.998%</span><span class="l">Uptime, 18mo</span></div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="section-head reveal">
+      <span class="eyebrow">The Protocol</span>
+      <h2>Three decisions that made it this fast.</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card panel reveal">
+        <span class="tag">01 · CONSENSUS</span>
+        <h3>Parallel finality</h3>
+        <p>Non-conflicting transactions settle in parallel lanes instead of one global queue — most blocks never touch each other at all.</p>
+      </div>
+      <div class="feature-card panel reveal">
+        <span class="tag">02 · VALIDATION</span>
+        <h3>Pruned state proofs</h3>
+        <p>Validators verify against a compressed state root, not full history — the chain gets faster as it gets older, not slower.</p>
+      </div>
+      <div class="feature-card panel reveal">
+        <span class="tag">03 · SETTLEMENT</span>
+        <h3>Rollup to L1 hourly</h3>
+        <p>Batched proofs settle to the base layer every sixty minutes — fast enough to trust, cheap enough to run continuously.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="section-head reveal">
+      <span class="eyebrow">Benchmarks</span>
+      <h2>Measured against the two chains people actually compare us to.</h2>
+    </div>
+    <div class="compare panel reveal">
+      <div class="compare-col">
+        <h4>Chain A</h4>
+        <div class="compare-row"><span>Finality</span><span class="v">~12s</span></div>
+        <div class="compare-row"><span>Avg. fee</span><span class="v">$0.04</span></div>
+        <div class="compare-row"><span>TPS (peak)</span><span class="v">4,200</span></div>
+      </div>
+      <div class="compare-col hi">
+        <h4>Lumen</h4>
+        <div class="compare-row"><span>Finality</span><span class="v">412ms</span></div>
+        <div class="compare-row"><span>Avg. fee</span><span class="v">$0.0002</span></div>
+        <div class="compare-row"><span>TPS (peak)</span><span class="v">61,000</span></div>
+      </div>
+      <div class="compare-col">
+        <h4>Chain B</h4>
+        <div class="compare-row"><span>Finality</span><span class="v">~2.1s</span></div>
+        <div class="compare-row"><span>Avg. fee</span><span class="v">$0.01</span></div>
+        <div class="compare-row"><span>TPS (peak)</span><span class="v">9,800</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="build">
+    <div class="cta-final panel reveal">
+      <h2>Deploy against a chain that doesn't make you wait.</h2>
+      <p>Testnet faucet live. Full EVM compatibility — your existing contracts deploy unmodified.</p>
+      <a href="#" class="btn btn-solid">Get testnet tokens</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-row">
+      <span>LUMEN PROTOCOL</span>
+      <span>MAINNET · BLOCK #4,281,902 · AUDITED BY TRAIL OF BEES</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // particle network background
+  var canvas = document.getElementById('net');
+  var ctx = canvas.getContext('2d');
+  var nodes = [];
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function seed(){
+    nodes = [];
+    var count = Math.floor((canvas.width * canvas.height) / 26000);
+    for (var i=0;i<count;i++){
+      nodes.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        vx: (Math.random()-0.5)*0.25,
+        vy: (Math.random()-0.5)*0.25
+      });
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#020306';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    for (var i=0;i<nodes.length;i++){
+      var n = nodes[i];
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    }
+    for (var i=0;i<nodes.length;i++){
+      for (var j=i+1;j<nodes.length;j++){
+        var dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        var dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < 140){
+          ctx.strokeStyle = 'rgba(79,242,255,' + (0.16 * (1 - dist/140)).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (var i=0;i<nodes.length;i++){
+      ctx.beginPath();
+      ctx.arc(nodes[i].x, nodes[i].y, 1.6, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(154,92,255,0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  try{
+    resize(); seed();
+    window.addEventListener('resize', function(){ resize(); seed(); });
+    if (!reduced) requestAnimationFrame(draw);
+    else draw();
+  }catch(e){}
+
+  // live TPS counter
+  try{
+    var tpsEl = document.getElementById('tps');
+    function tickTps(){
+      var val = 58000 + Math.floor(Math.random()*6000);
+      tpsEl.textContent = val.toLocaleString();
+    }
+    tickTps();
+    setInterval(tickTps, 1800);
+  }catch(e){}
+
+  // scroll reveal
+  try{
+    var els = document.querySelectorAll('.reveal');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
+      });
+    }, {threshold:0.15});
+    els.forEach(function(el){ io.observe(el); });
+  }catch(e){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+})();
+</script>
+
+</body>
+</html>
